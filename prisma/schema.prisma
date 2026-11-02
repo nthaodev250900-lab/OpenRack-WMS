@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum MovementType {
+  RECEIVE
+  ISSUE
+  TRANSFER
+}
+
+model Company {
+  id        String        @id @default(cuid())
+  name      String
+  timeZone  String        @default("Asia/Ho_Chi_Minh")
+  users     User[]
+  theme     ThemeSetting?
+  createdAt DateTime      @default(now())
+}
+
+model User {
+  id             String    @id @default(cuid())
+  companyId      String
+  company        Company   @relation(fields: [companyId], references: [id])
+  name           String
+  email          String    @unique
+  passwordHash   String
+  role           Role      @default(VIEWER)
+  locale         String    @default("vi-VN")
+  appearance     String    @default("system")
+  failedLogins   Int       @default(0)
+  lockedUntil    DateTime?
+  sessions       Session[]
+  movements      StockMovement[]
+  createdAt      DateTime  @default(now())
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model ThemeSetting {
+  id             String   @id @default(cuid())
+  companyId      String   @unique
+  company        Company  @relation(fields: [companyId], references: [id])
+  themePreset    String   @default("regent-st-blue")
+  primaryColor   String   @default("#397e90")
+  customPalette  Json?
+  updatedById    String?
+  updatedAt      DateTime @updatedAt
+}
+
+model Warehouse {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  address   String
+  zones     Zone[]
+  createdAt DateTime @default(now())
+}
+
+model Zone {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  racks       Rack[]
+}
+
+model Rack {
+  id     String @id @default(cuid())
+  code   String @unique
+  name   String
+  zoneId String
+  zone   Zone   @relation(fields: [zoneId], references: [id])
+  bins   Bin[]
+}
+
+model Bin {
+  id         String          @id @default(cuid())
+  code       String          @unique
+  name       String
+  rackId     String
+  rack       Rack            @relation(fields: [rackId], references: [id])
+  capacity   Int             @default(1000)
+  inventory  Inventory[]
+  outgoing   StockMovement[] @relation("SourceBin")
+  incoming   StockMovement[] @relation("TargetBin")
+}
+
+model Product {
+  id        String          @id @default(cuid())
+  sku       String          @unique
+  name      String
+  unit      String          @default("pcs")
+  minStock  Int             @default(10)
+  inventory Inventory[]
+  movements StockMovement[]
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  binId     String
+  bin       Bin      @relation(fields: [binId], references: [id])
+  quantity  Int      @default(0)
+  updatedAt DateTime @updatedAt
+  @@unique([productId, binId])
+}
+
+model StockMovement {
+  id           String       @id @default(cuid())
+  reference    String       @unique
+  type         MovementType
+  productId    String
+  product      Product      @relation(fields: [productId], references: [id])
+  quantity     Int
+  sourceBinId  String?
+  sourceBin    Bin?         @relation("SourceBin", fields: [sourceBinId], references: [id])
+  targetBinId  String?
+  targetBin    Bin?         @relation("TargetBin", fields: [targetBinId], references: [id])
+  createdById  String
+  createdBy    User         @relation(fields: [createdById], references: [id])
+  note         String?      @db.Text
+  createdAt    DateTime     @default(now())
+  @@index([createdAt])
+}

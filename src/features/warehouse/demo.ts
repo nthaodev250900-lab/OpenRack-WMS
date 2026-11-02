@@ -1,0 +1,76 @@
+import type { WarehouseData } from './types';
+export const demoData: WarehouseData = {
+  warehouses: [
+    { id: 'wh-1', code: 'WH-HCM', name: 'Kho trung tâm', address: 'Thành phố Hồ Chí Minh' },
+    { id: 'wh-2', code: 'WH-HN', name: 'Kho miền Bắc', address: 'Hà Nội' },
+    { id: 'wh-3', code: 'WH-DN', name: 'Kho miền Trung', address: 'Đà Nẵng' },
+  ],
+  zones: [
+    { id: 'z-1', code: 'HCM-A', name: 'Khu A', warehouseId: 'wh-1' },
+    { id: 'z-2', code: 'HN-A', name: 'Khu A', warehouseId: 'wh-2' },
+    { id: 'z-3', code: 'DN-A', name: 'Khu A', warehouseId: 'wh-3' },
+  ],
+  racks: [
+    { id: 'r-1', code: 'HCM-A-01', name: 'Kệ 01', zoneId: 'z-1' },
+    { id: 'r-2', code: 'HN-A-01', name: 'Kệ 01', zoneId: 'z-2' },
+    { id: 'r-3', code: 'DN-A-01', name: 'Kệ 01', zoneId: 'z-3' },
+  ],
+  bins: [
+    { id: 'b-1', code: 'HCM-A-01-01', name: 'Ô 01', rackId: 'r-1', capacity: 2000 },
+    { id: 'b-2', code: 'HCM-A-01-02', name: 'Ô 02', rackId: 'r-1', capacity: 1500 },
+    { id: 'b-3', code: 'HN-A-01-01', name: 'Ô 01', rackId: 'r-2', capacity: 2500 },
+    { id: 'b-4', code: 'DN-A-01-01', name: 'Ô 01', rackId: 'r-3', capacity: 1000 },
+  ],
+  products: [
+    { id: 'p-1', sku: 'PKG-001', name: 'Thùng carton 40 × 30', unit: 'pcs', minStock: 100 },
+    { id: 'p-2', sku: 'PKG-002', name: 'Băng keo đóng gói', unit: 'pcs', minStock: 100 },
+    { id: 'p-3', sku: 'EQP-001', name: 'Máy quét mã vạch', unit: 'pcs', minStock: 20 },
+    { id: 'p-4', sku: 'PKG-003', name: 'Màng bọc hàng', unit: 'pcs', minStock: 50 },
+  ],
+  inventory: [
+    { id: 'i-1', productId: 'p-1', binId: 'b-1', quantity: 1400 },
+    { id: 'i-2', productId: 'p-2', binId: 'b-2', quantity: 920 },
+    { id: 'i-3', productId: 'p-1', binId: 'b-3', quantity: 1800 },
+    { id: 'i-4', productId: 'p-3', binId: 'b-4', quantity: 12 },
+    { id: 'i-5', productId: 'p-4', binId: 'b-4', quantity: 420 },
+  ],
+  movements: [
+    {
+      id: 'm-1',
+      reference: 'GR-20261102-001',
+      type: 'RECEIVE',
+      productId: 'p-1',
+      quantity: 400,
+      sourceBinId: null,
+      targetBinId: 'b-1',
+      createdAt: '2026-11-02T08:30:00.000Z',
+      note: null,
+    },
+    {
+      id: 'm-2',
+      reference: 'GI-20261102-001',
+      type: 'ISSUE',
+      productId: 'p-2',
+      quantity: 80,
+      sourceBinId: 'b-2',
+      targetBinId: null,
+      createdAt: '2026-11-02T07:15:00.000Z',
+      note: null,
+    },
+    {
+      id: 'm-3',
+      reference: 'TR-20261101-001',
+      type: 'TRANSFER',
+      productId: 'p-1',
+      quantity: 200,
+      sourceBinId: 'b-1',
+      targetBinId: 'b-3',
+      createdAt: '2026-11-01T09:10:00.000Z',
+      note: null,
+    },
+  ],
+  users: [
+    { id: 'u-1', name: 'Nguyễn An', email: 'admin@example.com', role: 'ADMIN' },
+    { id: 'u-2', name: 'Trần Bình', email: 'operator@example.com', role: 'OPERATOR' },
+  ],
+};
